@@ -20,7 +20,7 @@ interface HoldingsInterface {
 }
 
 interface HoldingsValueInterface {
-  [key: number] : number;
+  [key: number]: number;
 }
 
 interface YHErrorInterface {
@@ -63,32 +63,32 @@ const sqlQuery = async (props: { pool: Pool, query: string, queryArguments: any[
   let success = true;
 
   const client = await pool.connect()
- 
+
   const result = await client
     .query(query, queryArguments)
     .then(res => {
       return res
     })
-    .catch((e)=> {
+    .catch((e) => {
       success = false;
       return e;
     }
-  )
+    )
 
   client.release(true)
-  
+
   if (success) return result;
   else throw result;
 }
 
 const fetchTickersFromHoldings = async (pool: Pool) => {
-  const result = await sqlQuery({ 
-    pool, 
-    query: sql.getAllTickers, 
+  const result = await sqlQuery({
+    pool,
+    query: sql.getAllTickers,
     queryArguments: []
   })
 
-  return result.rows.map((row: {ticker: string}) => (row.ticker))
+  return result.rows.map((row: { ticker: string }) => (row.ticker))
 }
 
 const updateOrInsertPortfolio = async (pool: Pool, userId: string, value: number) => {
@@ -115,21 +115,21 @@ const getAllUsers = async (pool: Pool) => {
     query: sql.getAllUsers,
     queryArguments: []
   })).rows;
-  const userList = result.map((row: {user_id: number, cash: number}) => [row.user_id, row.cash]);
+  const userList = result.map((row: { user_id: number, cash: number }) => [row.user_id, row.cash]);
   return new Map<number, number>(userList)
 }
 
-const getMultipleTickersAsMap = async ( tickers: string[] ) => {
+const getMultipleTickersAsMap = async (tickers: string[]) => {
   if (tickers.length === 0) return new Map();
   try {
     const result = await yahooFinance.quote(tickers, { return: 'map' });
     return result;
-  } catch(err) {
-    if (isYHError(err)) { 
+  } catch (err) {
+    if (isYHError(err)) {
       console.log(err.errors);
       return {
         ...err.result,
-      } 
+      }
     }
     return null
   }
@@ -140,7 +140,7 @@ export const handler = async (event: APIGatewayEvent, context: Context): Promise
   const tickers = await fetchTickersFromHoldings(pool);
 
   const tickersInfo = await getMultipleTickersAsMap(tickers)
-  
+
   if (!tickersInfo) {
     throw new Error("Error retrieving tickers");
   }
@@ -152,9 +152,9 @@ export const handler = async (event: APIGatewayEvent, context: Context): Promise
   holdings.forEach((holdingsRow) => {
     const { user_id: userId, ticker, quantity: quantityString } = holdingsRow;
     const quantity = parseInt(quantityString);
-    
+
     if ((userId in holdingsValue) === false) {
-      holdingsValue = { ... holdingsValue, [userId]: 0 }
+      holdingsValue = { ...holdingsValue, [userId]: 0 }
     }
 
     let price: number = 0;
@@ -185,7 +185,7 @@ export const handler = async (event: APIGatewayEvent, context: Context): Promise
   return {
     statusCode: 200,
     body: JSON.stringify({
-        message: 'completed',
+      message: 'completed',
     }),
-};
+  };
 }
