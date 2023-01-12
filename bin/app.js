@@ -35,6 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.handler = void 0;
 const dotenv = __importStar(require("dotenv"));
 const pg_1 = require("pg");
 const yahoo_finance2_1 = __importDefault(require("yahoo-finance2"));
@@ -139,7 +140,7 @@ const getMultipleTickersAsMap = (tickers) => __awaiter(void 0, void 0, void 0, f
         return null;
     }
 });
-const main = () => __awaiter(void 0, void 0, void 0, function* () {
+const handler = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
     const pool = new pg_1.Pool(config);
     const tickers = yield fetchTickersFromHoldings(pool);
     const tickersInfo = yield getMultipleTickersAsMap(tickers);
@@ -177,5 +178,11 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         console.log("Update user with id " + key.toString());
     }));
     console.log("completed");
+    return {
+        statusCode: 200,
+        body: JSON.stringify({
+            message: 'completed',
+        }),
+    };
 });
-main();
+exports.handler = handler;

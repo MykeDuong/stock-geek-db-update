@@ -1,0 +1,1 @@
+{"errorType":"SyntaxError","errorMessage":"Unexpected token a in JSON at position 1","trace":["SyntaxError: Unexpected token a in JSON at position 1","    at JSON.parse (<anonymous>)","    at Runtime.handleOnceNonStreaming (file:///var/runtime/index.mjs:1089:42)"]}

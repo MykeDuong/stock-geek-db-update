@@ -1,6 +1,5 @@
-FROM node:18-alpine
-WORKDIR /Users/minhhongduong/Projects/stock-geek/stock-geek-update-worker
+FROM public.ecr.aws/lambda/nodejs:18
 COPY . .
+RUN npm install -g yarn
 RUN yarn install --production
-CMD ["yarn", "start"]
-EXPOSE 3001
+CMD [ "./bin/app.handler" ]

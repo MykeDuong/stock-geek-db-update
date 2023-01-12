@@ -1,3 +1,4 @@
+import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda';
 import * as dotenv from 'dotenv'
 import { Pool, PoolConfig } from 'pg';
 import yahooFinance from "yahoo-finance2"
@@ -134,7 +135,7 @@ const getMultipleTickersAsMap = async ( tickers: string[] ) => {
   }
 }
 
-const main = async() => {
+export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
   const pool = new Pool(config);
   const tickers = await fetchTickersFromHoldings(pool);
 
@@ -181,6 +182,10 @@ const main = async() => {
     console.log("Update user with id " + key.toString());
   })
   console.log("completed");
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+        message: 'completed',
+    }),
+};
 }
-
-main();
