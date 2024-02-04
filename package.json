@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc && docker build -t stock-geek-update-worker .",
     "start": "node ./bin/app.js",
-    "dev": "tsc && node ./bin/app.handler"
+    "dev": "tsc && node ./bin/app.handler",
+    "test": "tsc && node ./bin/test.js"
   },
   "dependencies": {
     "@types/aws-lambda": "^8.10.109",
@@ -18,7 +19,7 @@
     "dotenv": "^16.0.3",
     "pg": "^8.8.0",
     "typescript": "^4.9.4",
-    "yahoo-finance2": "^2.3.10"
+    "yahoo-finance2": "^2.8.0"
   },
   "devDependencies": {
     "ts-node": "^10.9.1"

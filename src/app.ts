@@ -28,7 +28,7 @@ interface YHErrorInterface {
   result: any;
 }
 
-const config: PoolConfig = {
+export const config: PoolConfig = {
   connectionString: `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}?options`,
 }
 
@@ -81,7 +81,7 @@ const sqlQuery = async (props: { pool: Pool, query: string, queryArguments: any[
   else throw result;
 }
 
-const fetchTickersFromHoldings = async (pool: Pool) => {
+export const fetchTickersFromHoldings = async (pool: Pool) => {
   const result = await sqlQuery({
     pool,
     query: sql.getAllTickers,
@@ -119,12 +119,14 @@ const getAllUsers = async (pool: Pool) => {
   return new Map<number, number>(userList)
 }
 
-const getMultipleTickersAsMap = async (tickers: string[]) => {
+export const getMultipleTickersAsMap = async (tickers: string[]) => {
   if (tickers.length === 0) return new Map();
   try {
     const result = await yahooFinance.quote(tickers, { return: 'map' });
+    console.log("completed")
     return result;
   } catch (err) {
+    console.log("Checking error...")
     if (isYHError(err)) {
       console.log(err.errors);
       return {
@@ -135,7 +137,7 @@ const getMultipleTickersAsMap = async (tickers: string[]) => {
   }
 }
 
-export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
+export const handler = async (_event: APIGatewayEvent, _context: Context): Promise<APIGatewayProxyResult> => {
   const pool = new Pool(config);
   const tickers = await fetchTickersFromHoldings(pool);
 

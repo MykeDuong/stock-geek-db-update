@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handler = void 0;
+exports.handler = exports.getMultipleTickersAsMap = exports.fetchTickersFromHoldings = exports.config = void 0;
 const dotenv = __importStar(require("dotenv"));
 const pg_1 = require("pg");
 const yahoo_finance2_1 = __importDefault(require("yahoo-finance2"));
@@ -47,7 +47,7 @@ const yahoo_finance2_1 = __importDefault(require("yahoo-finance2"));
 */
 // Configurations and Constants
 dotenv.config();
-const config = {
+exports.config = {
     connectionString: `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}?options`,
 };
 const sql = {
@@ -101,6 +101,7 @@ const fetchTickersFromHoldings = (pool) => __awaiter(void 0, void 0, void 0, fun
     });
     return result.rows.map((row) => (row.ticker));
 });
+exports.fetchTickersFromHoldings = fetchTickersFromHoldings;
 const updateOrInsertPortfolio = (pool, userId, value) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield sqlQuery({
         pool,
@@ -130,9 +131,11 @@ const getMultipleTickersAsMap = (tickers) => __awaiter(void 0, void 0, void 0, f
         return new Map();
     try {
         const result = yield yahoo_finance2_1.default.quote(tickers, { return: 'map' });
+        console.log("completed");
         return result;
     }
     catch (err) {
+        console.log("Checking error...");
         if (isYHError(err)) {
             console.log(err.errors);
             return Object.assign({}, err.result);
@@ -140,10 +143,11 @@ const getMultipleTickersAsMap = (tickers) => __awaiter(void 0, void 0, void 0, f
         return null;
     }
 });
-const handler = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
-    const pool = new pg_1.Pool(config);
-    const tickers = yield fetchTickersFromHoldings(pool);
-    const tickersInfo = yield getMultipleTickersAsMap(tickers);
+exports.getMultipleTickersAsMap = getMultipleTickersAsMap;
+const handler = (_event, _context) => __awaiter(void 0, void 0, void 0, function* () {
+    const pool = new pg_1.Pool(exports.config);
+    const tickers = yield (0, exports.fetchTickersFromHoldings)(pool);
+    const tickersInfo = yield (0, exports.getMultipleTickersAsMap)(tickers);
     if (!tickersInfo) {
         throw new Error("Error retrieving tickers");
     }
